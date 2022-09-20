@@ -1,0 +1,18 @@
+@import 'global-overrides';
+@import 'rwd';
+
+body {
+  width: 100vw;
+  height: 100vh;
+  background-image: url(../assets/img/coffee-shop-sm.jpg);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+@media (min-width: $min-width-768) {
+  body {
+    background-image: url(../assets/img/coffee-shop-xl.jpg);
+  }
+}

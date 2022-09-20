@@ -21,7 +21,7 @@
           "error",
           {
             "type": "element",
-            "prefix": "starbucks-app",
+            "prefix": "starbucks",
             "style": "kebab-case"
           }
         ]

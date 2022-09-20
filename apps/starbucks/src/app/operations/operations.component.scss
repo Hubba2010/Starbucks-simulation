@@ -1,0 +1,11 @@
+:host {
+  position: absolute;
+  right: 0;
+  .operations {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    width: 700px;
+    height: 100px;
+  }
+}
