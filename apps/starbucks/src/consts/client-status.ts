@@ -1,0 +1,4 @@
+export enum STATUS {
+  WAITING = 'WAITING FOR COFFEE',
+  IN_QUEUE = 'IN QUEUE',
+}

@@ -1,0 +1,18 @@
+<div class="clients" *ngIf="clients$ | async as clients">
+  <div class="clients__queue">
+    <img
+      *ngFor="let clientInQueue of clients.slice(6, 20)"
+      [src]="'../../assets/img/human' + clientInQueue.imgId + '.PNG'"
+      alt="Client waiting to get a coffee"
+      class="clients__img queue"
+    />
+  </div>
+  <div class="clients__waiting">
+    <img
+      *ngFor="let waitingClient of clients.slice(0, 6)"
+      [src]="'../../assets/img/human' + waitingClient.imgId + '.PNG'"
+      alt="Client waiting to get a coffee"
+      class="clients__img"
+    />
+  </div>
+</div>

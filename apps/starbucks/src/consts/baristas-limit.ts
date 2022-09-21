@@ -1,1 +1,1 @@
-export const BARISTAS_LIMIT = 8;
+export const BARISTAS_LIMIT = 6;

@@ -1,5 +1,27 @@
-<div class="operations">
-  <starbucks-button>Dodaj klienta</starbucks-button>
-  <starbucks-button>Dodaj baristę</starbucks-button>
-  <starbucks-button>Usuń Baristę</starbucks-button>
+<div
+  class="operations"
+  *ngIf="{
+    baristasAmount: baristasAmount$ | async,
+    clientsAmount: clientsAmount$ | async
+  } as amounts"
+>
+  <starbucks-button
+    [disabled]="amounts.clientsAmount === this.CLIENTS_LIMIT"
+    (clicked)="addClient()"
+    >Dodaj klienta ({{ amounts.clientsAmount }}/{{
+      this.CLIENTS_LIMIT
+    }})</starbucks-button
+  >
+  <starbucks-button
+    [disabled]="amounts.baristasAmount === this.BARISTAS_LIMIT"
+    (clicked)="addBarista()"
+    >Dodaj baristę ({{ amounts.baristasAmount }}/{{
+      this.BARISTAS_LIMIT
+    }})</starbucks-button
+  >
+  <starbucks-button
+    [disabled]="!amounts.baristasAmount"
+    (clicked)="removeBarista()"
+    >Usuń Baristę</starbucks-button
+  >
 </div>
