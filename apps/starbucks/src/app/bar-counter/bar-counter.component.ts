@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
-import { OperationsService } from '../shared/services/operations.service';
+import { BarService } from '../shared/services/bar.service';
 
 @Component({
   selector: 'starbucks-counter',
@@ -8,6 +8,6 @@ import { OperationsService } from '../shared/services/operations.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BarCounterComponent {
-  baristasAmount$ = this.operationsService.baristasAmountSub$;
-  constructor(private operationsService: OperationsService) {}
+  baristasSub$ = this.barService.baristasSub$;
+  constructor(private barService: BarService) {}
 }

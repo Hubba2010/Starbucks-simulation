@@ -7,5 +7,5 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgressBarComponent {
-  @Input() progress = 90;
+  @Input() progress = 0;
 }
