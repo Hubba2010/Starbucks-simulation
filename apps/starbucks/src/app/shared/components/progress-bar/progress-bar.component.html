@@ -1,0 +1,14 @@
+<div
+  [ngStyle]="{
+    width: progress + '%',
+    backgroundColor:
+      progress < 40
+        ? 'tomato'
+        : progress < 75
+        ? 'yellow'
+        : progress <= 100
+        ? 'lime'
+        : null
+  }"
+  class="progress-bar"
+></div>

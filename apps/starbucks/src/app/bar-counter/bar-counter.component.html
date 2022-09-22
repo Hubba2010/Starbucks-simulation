@@ -3,11 +3,16 @@
     class="bar-counter__baristas"
     *ngIf="baristasAmount$ | async as baristas"
   >
-    <img
+    <div
+      class="bar-counter__barista"
       *ngFor="let barista of [].constructor(baristas)"
-      src="../../assets/img/barista.png"
-      class="bar-counter__barista-img"
-      alt="Barista pouring coffee"
-    />
+    >
+      <img
+        src="../../assets/img/barista.png"
+        class="bar-counter__barista-img"
+        alt="Barista pouring coffee"
+      />
+      <starbucks-progress-bar></starbucks-progress-bar>
+    </div>
   </div>
 </div>

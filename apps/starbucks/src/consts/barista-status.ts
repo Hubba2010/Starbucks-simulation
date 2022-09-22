@@ -1,0 +1,4 @@
+export enum BARISTA_STATUS {
+  BUSY = 'BUSY',
+  AVAILABLE = 'AVAILABLE',
+}

@@ -1,4 +1,5 @@
-export enum STATUS {
+export enum CLIENT_STATUS {
   WAITING = 'WAITING FOR COFFEE',
+  ABOUT_TO_ORDER = 'ABOUT_TO_ORDER',
   IN_QUEUE = 'IN QUEUE',
 }

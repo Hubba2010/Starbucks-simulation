@@ -1,8 +1,8 @@
-import { STATUS } from '../../consts';
+import { CLIENT_STATUS } from '../../consts';
 
 export interface Client {
   clientId: number;
   imgId: number;
   priority: number;
-  status: STATUS.WAITING | STATUS.IN_QUEUE;
+  status: CLIENT_STATUS.WAITING | CLIENT_STATUS.IN_QUEUE;
 }

@@ -16,7 +16,14 @@
       position: absolute;
       top: 6%;
       height: 88%;
-      width: 72px;
+      width: 90%;
+    }
+    &__barista {
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+      align-items: center;
+      gap: 30px;
     }
     &__barista-img {
       height: 72px;

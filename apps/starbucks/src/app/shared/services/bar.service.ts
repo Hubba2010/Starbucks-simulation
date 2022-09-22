@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { STATUS } from 'apps/starbucks/src/consts';
-import { Client } from '../../models/client';
+import { BARISTA_STATUS, CLIENT_STATUS } from 'apps/starbucks/src/consts';
+import { Client, Barista } from '../../models';
 
 @Injectable({ providedIn: 'root' })
 export class BarService {
+  baristas: Barista[] = [];
   clients: Client[] = [];
+  baristasSub$ = new BehaviorSubject<Barista[]>([]);
   clientsSub$ = new BehaviorSubject<Client[]>([]);
 
   onAddClient() {
@@ -15,11 +17,32 @@ export class BarService {
       clientId: id,
       imgId: imgId,
       priority: clientPriority,
-      status: clientPriority > 6 ? STATUS.IN_QUEUE : STATUS.WAITING,
+      status:
+        clientPriority > 6 ? CLIENT_STATUS.IN_QUEUE : CLIENT_STATUS.WAITING,
     });
     console.log(this.clients);
     this.updateClients(this.clients);
   }
+
+  onClientServe(priority: number) {
+    const index = this.clients.findIndex(
+      (client: Client) => client.priority === priority - 1
+    );
+    this.clients.splice(index, 1);
+    this.clientsSub$.next(this.clients);
+  }
+
+  onAddBarista() {
+    const bId = this.baristas.length + 1;
+    this.baristas.push({ id: bId, status: BARISTA_STATUS.AVAILABLE });
+    this.baristasSub$.next(this.baristas);
+  }
+  onRemoveBarista() {
+    this.baristas.pop();
+    this.baristasSub$.next(this.baristas);
+  }
+
+  //   Check barista availability if there is a free one, order and replace priority
 
   updateClients(clients: Client[]): void {
     this.clientsSub$.next(clients);
