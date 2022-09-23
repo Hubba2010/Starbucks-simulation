@@ -76,6 +76,7 @@ export class BarService {
     );
     this.clients[index].status = CLIENT_STATUS.ABOUT_TO_ORDER;
     this.baristas.pop();
+    this.updateClients();
     this.updateBaristas();
     this.serveValidClient();
   }
