@@ -1,5 +1,11 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, interval, take, timer } from 'rxjs';
+import {
+  BehaviorSubject,
+  interval,
+  Subscription,
+  takeWhile,
+  timer,
+} from 'rxjs';
 import {
   BARISTAS_LIMIT,
   BARISTA_STATUS,
@@ -8,12 +14,17 @@ import {
 } from 'apps/starbucks/src/consts';
 import { Client, Barista } from '../../models';
 
+// Interval for updating progress bars
+const UPDATE_INTERVAL = 100;
+
 @Injectable({ providedIn: 'root' })
 export class BarService {
   baristas: Barista[] = [];
   clients: Client[] = [];
   baristasSub$ = new BehaviorSubject<Barista[]>([]);
   clientsSub$ = new BehaviorSubject<Client[]>([]);
+  timerSubs: Subscription[] = [];
+  intervalSubs: Subscription[] = [];
 
   onAddClient() {
     const [id, imgId] = [...this.generateRandomNumbers()];
@@ -25,7 +36,7 @@ export class BarService {
           ? CLIENT_STATUS.IN_QUEUE
           : CLIENT_STATUS.ABOUT_TO_ORDER,
     });
-    this.updateClients(this.clients);
+    this.updateClients();
     this.serveValidClient();
   }
 
@@ -33,7 +44,6 @@ export class BarService {
     const index = this.clients.findIndex(
       (client: Client) => client.id === clientId
     );
-    console.log(index);
     this.clients.splice(index, 1);
     this.shiftQueue();
     this.clientsSub$.next(this.clients);
@@ -51,12 +61,23 @@ export class BarService {
   onAddBarista() {
     const bId = this.baristas.length + 1;
     this.baristas.push({ id: bId, status: BARISTA_STATUS.AVAILABLE });
-    this.baristasSub$.next(this.baristas);
+    this.updateBaristas();
     this.serveValidClient();
   }
   onRemoveBarista() {
+    const servedClient = this.baristas.slice(-1)[0].client;
+    if (!servedClient) {
+      this.baristas.pop();
+      this.updateBaristas();
+      return;
+    }
+    const index = this.clients.findIndex(
+      (client: Client) => client.id === servedClient
+    );
+    this.clients[index].status = CLIENT_STATUS.ABOUT_TO_ORDER;
     this.baristas.pop();
-    this.baristasSub$.next(this.baristas);
+    this.updateBaristas();
+    this.serveValidClient();
   }
 
   checkIfClient(): Client | undefined {
@@ -79,38 +100,55 @@ export class BarService {
     const cIndex = this.clients.indexOf(client);
     const clientId = client.id;
     barista.status = BARISTA_STATUS.BUSY;
+    barista.client = clientId;
     client.status = CLIENT_STATUS.WAITING;
     this.baristas[bIndex] = barista;
     this.clients[cIndex] = client;
+    this.updateClients();
     this.takeOrder(bIndex, clientId);
   }
 
   takeOrder(bIndex: number, cIndex: number) {
+    // Cancel previous subscriptions to avoid memory leaks (if barista was removed recently)
+    if (this.timerSubs[bIndex]) this.timerSubs[bIndex].unsubscribe();
+    if (this.intervalSubs[bIndex]) this.intervalSubs[bIndex].unsubscribe();
+
     const randomTime = this.generateRandomTime();
-    const makingCoffee = timer(randomTime).pipe(take(1));
+    const makingCoffee = timer(randomTime).pipe(
+      takeWhile(() => !!this.baristas[bIndex])
+    );
     const completionTime = new Date().getTime() + randomTime;
-    const updateProgress = interval(200).subscribe(() => {
-      const timeLeft = completionTime - new Date().getTime();
-      const progress = Math.floor(100 - (timeLeft / randomTime) * 100);
-      this.baristas[bIndex].progress = progress;
-      this.baristasSub$.next(this.baristas);
-    });
-    makingCoffee.subscribe(() => {
-      if (!this.baristas[bIndex]) return;
-      updateProgress.unsubscribe();
+    this.intervalSubs[bIndex] = interval(UPDATE_INTERVAL)
+      .pipe(takeWhile(() => !!this.baristas[bIndex]))
+      .subscribe(() => {
+        const timeLeft = completionTime - new Date().getTime();
+        const progress = Math.floor(100 - (timeLeft / randomTime) * 100);
+        this.baristas[bIndex].progress = progress;
+        this.updateBaristas();
+      });
+    this.timerSubs[bIndex] = makingCoffee.subscribe(() => {
+      this.intervalSubs[bIndex].unsubscribe();
       this.onClientServe(cIndex);
-      this.baristas[bIndex].status = BARISTA_STATUS.AVAILABLE;
-      this.baristas[bIndex].progress = 0;
-      this.baristasSub$.next(this.baristas);
+      this.baristas[bIndex] = {
+        ...this.baristas[bIndex],
+        client: undefined,
+        status: BARISTA_STATUS.AVAILABLE,
+        progress: 0,
+      };
+      this.updateBaristas();
       this.serveValidClient();
     });
   }
 
-  updateClients(clients: Client[]): void {
-    this.clientsSub$.next(clients);
+  updateBaristas(): void {
+    this.baristasSub$.next(this.baristas);
   }
 
-  generateRandomTime() {
+  updateClients(): void {
+    this.clientsSub$.next(this.clients);
+  }
+
+  generateRandomTime(): number {
     const min = Math.ceil(DURATIONS.MIN);
     const max = Math.floor(DURATIONS.MAX) + 1;
     return Math.floor(Math.random() * (max - min) + min) * 1000;
