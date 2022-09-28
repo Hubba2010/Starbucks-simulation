@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
-import { BARISTAS_LIMIT, CLIENTS_LIMIT } from 'apps/starbucks/src/consts';
+import { BARISTAS_LIMIT, CLIENTS_LIMIT } from 'consts';
 import { BarService } from './bar.service';
 
 @Injectable({ providedIn: 'root' })
 export class OperationsService {
   baristasAmount = 0;
   clientsAmount = 0;
-  baristasAmountSub$ = new BehaviorSubject<number>(this.baristasAmount);
-  clientsAmountSub$ = new BehaviorSubject<number>(this.clientsAmount);
+  baristasAmountSub$ = new BehaviorSubject<number>(0);
+  clientsAmountSub$ = new BehaviorSubject<number>(0);
 
   constructor(private barService: BarService) {
     this.barService.clientsSub$.subscribe((clients) => {
